@@ -1,18 +1,60 @@
-<<<<<<< HEAD
-# Welcome to your CDK TypeScript project
+AWS CDK + CodePipeline Project - Dhyey8965482
+1. Project Overview
+This project demonstrates the use of AWS Cloud Development Kit (CDK) to create AWS resources and configure a CI/CD pipeline using AWS CodePipeline. The pipeline automatically deploys changes from a GitHub repository when code is pushed, enabling continuous integration and deployment of cloud infrastructure.
 
-This is a blank project for CDK development with TypeScript.
+2. AWS Resources Created (Free Tier)
+- Amazon S3 Bucket: Stores static files or Lambda artifacts.
+- AWS Lambda Function: Simple function returning “Hello, World!”
+- Amazon DynamoDB Table: For CRUD operations using partition key 'id'.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+3. Technologies Used
+- AWS CDK (TypeScript)
+- AWS CodePipeline
+- AWS CodeBuild
+- AWS CLI
+- GitHub (source repository)
 
-## Useful commands
+4. CDK Stack Details
+- S3 Bucket with versioning enabled.
+- Lambda Function using inline Node.js code.
+- DynamoDB Table with string partition key.
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
-=======
-# dhyey8965482-cdk-project
->>>>>>> 10b375e0ab1770edd1b75e4002627c0ea6b1233e
+5. CodePipeline Setup Steps
+1. Created GitHub repository and pushed CDK code.
+2. Configured AWS CodePipeline:
+   - Source: GitHub
+   - Build: AWS CodeBuild using buildspec.yml
+   - Deploy: CDK Deploy via CloudFormation
+
+6. buildspec.yml
+
+version: 0.2
+phases:
+  install:
+    commands:
+      - npm install -g aws-cdk
+      - npm install
+  build:
+    commands:
+      - cdk synth
+      - cdk deploy --require-approval never
+artifacts:
+  files:
+    - '**/*'
+
+7. Permissions Issues & Fixes
+Issue: CodeBuild role lacked permission to access SSM Parameter and S3 bucket.
+
+Fix: Added inline policies to CodeBuild role:
+- Allow ssm:GetParameter on /cdk-bootstrap/hnb659fds/version
+- Allow s3:GetObject*, s3:PutObject*, s3:ListBucket on cdk-hnb659fds-assets-* bucket
+
+8. Testing & Validation
+- Verified successful creation of S3, Lambda, and DynamoDB in AWS Console.
+- Modified Lambda function and pushed to GitHub.
+- Verified that CodePipeline triggered automatically and updated resources.
+
+9. Screenshots Included
+- AWS Console: S3, Lambda, DynamoDB
+- CodePipeline execution status (Success)
+
